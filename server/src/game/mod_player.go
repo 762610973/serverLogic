@@ -40,3 +40,27 @@ func (self *ModPlayer) SetCard(cardId int, player *Player) {
 	player.ModPlayer.Card = cardId
 	fmt.Println("当前名片:", player.ModPlayer.Card)
 }
+
+func (self *ModPlayer) SetName(name string, player *Player) {
+	/*if !player.ModCard.IsHasCard(name) {
+		return
+	}*/
+	// 判断违禁词库中是否存在name这个违禁词语
+	if GetManageBanWord().IsBanWord(name) {
+		return
+	}
+	//调用外部链接，http地址接口，验证字符串是否合法(外部接口可能出现问题)
+	//正确做法：有一个违禁词库
+	player.ModPlayer.Name = name
+	fmt.Println("当前名字:", player.ModPlayer.Name)
+}
+func (self *ModPlayer) SetSign(sign string, player *Player) {
+	/*if !player.ModCard.IsHasCard(name) {
+		return
+	}*/
+	if GetManageBanWord().IsBanWord(sign) {
+		return
+	}
+	player.ModPlayer.Sign = sign
+	fmt.Println("当前签名:", player.ModPlayer.Sign)
+}

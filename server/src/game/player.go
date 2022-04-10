@@ -35,3 +35,13 @@ func (self *Player) ReceiveSetIcon(iconId int) {
 func (self *Player) ReceiveSetCard(cardId int) {
 	self.ModPlayer.SetCard(cardId, self)
 }
+
+// ReceiveSetName 修改名字
+func (self *Player) ReceiveSetName(name string) {
+	self.ModPlayer.SetName(name, self)
+}
+
+// ReceiveSetSign 设置签名
+func (self *Player) ReceiveSetSign(sign string) {
+	self.ModPlayer.SetSign(sign, self)
+}
