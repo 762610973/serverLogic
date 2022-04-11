@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"serverLogic/server/src/csvs"
 	"serverLogic/server/src/game"
+	"time"
 )
 
 func main() {
@@ -18,22 +20,19 @@ func main() {
 
 	//公共管理类，每个类都调用一个线程
 	//每个玩家都是一个线程
+	csvs.CheckLoadCsv()
 	fmt.Println("数据测试----start")
-	/*	头像、卡片、id、name测试
-		player := game.NewTestPlayer()
-		player.ReceiveSetIcon(1) //胡桃
-		player.ReceiveSetIcon(2) //温迪
-		player.ReceiveSetIcon(3) //钟离
-
-		player.ReceiveSetCard(11) //胡桃
-		player.ReceiveSetCard(22) //温迪
-		player.ReceiveSetCard(33) //钟离
-
-		player.ReceiveSetName("好人")
-		player.ReceiveSetName("坏人")
-		player.ReceiveSetName("求外挂")
-		player.ReceiveSetName("感觉不如原神。。画质")*/
 	//需要进行服务器的配置
 	go game.GetManageBanWord().Run()
+	//这里先获得一个基本的违禁词表，然后再调用run函数，run函数会调用读取配置表的函数，读取到完整的配置表
+	playerGM := game.NewTestPlayer()
+	//设置一个定时器
+	ticker := time.NewTicker(time.Second * 1)
 
+	for {
+		select {
+		case <-ticker.C:
+			playerGM.ModPlayer.AddExp(5000, playerGM)
+		}
+	}
 }

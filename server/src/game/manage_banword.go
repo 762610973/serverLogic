@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"regexp"
+	"serverLogic/server/src/csvs"
 	"time"
 )
 
@@ -14,8 +15,7 @@ type ManageBanWord struct {
 
 }
 
-//单例模式，任何时候都用的是同一个
-
+// GetManageBanWord 应用单例模式，任何时候都用的是同一个
 func GetManageBanWord() *ManageBanWord {
 	if manageBanWord == nil {
 		manageBanWord = new(ManageBanWord)
@@ -27,6 +27,7 @@ func GetManageBanWord() *ManageBanWord {
 
 // IsBanWord 判断是否是违禁词
 func (self *ManageBanWord) IsBanWord(txt string) bool {
+	//
 	for _, v := range self.BanWordBase {
 		match, _ := regexp.MatchString(v, txt)
 		fmt.Println(match, v)
@@ -43,13 +44,15 @@ func (self *ManageBanWord) IsBanWord(txt string) bool {
 			return match
 		}
 	}
-
 	return false
 }
 
 // 定时器
 
 func (self *ManageBanWord) Run() {
+	//这里获取违禁词汇
+	self.BanWordBase = csvs.GetBanWordBase()
+	//fmt.Println(self.BanWordBase)
 	//基础词库的更新
 	//服务器启动的时候就会调用
 	ticker := time.NewTicker(time.Second * 1)
@@ -57,9 +60,9 @@ func (self *ManageBanWord) Run() {
 		select {
 		case <-ticker.C:
 			if time.Now().Unix()%10 == 0 {
-				fmt.Println("更新词库")
+				fmt.Println("\n更新词库")
 			} else {
-				fmt.Println("待机")
+				//fmt.Println("待机")
 			}
 		}
 	}

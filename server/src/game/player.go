@@ -6,9 +6,10 @@ package game
 //增加经验的接口一定是内部接口
 
 type Player struct {
-	ModPlayer *ModPlayer //基础模块
-	ModIcon   *ModIcon   //头像模块
-	ModCard   *ModCard   //名片模块
+	ModPlayer     *ModPlayer //基础模块
+	ModIcon       *ModIcon   //头像模块
+	ModCard       *ModCard   //名片模块
+	ModUniqueTask *ModUniqueTask
 }
 
 // NewTestPlayer 生成玩家
@@ -19,9 +20,11 @@ func NewTestPlayer() *Player {
 	player.ModPlayer = new(ModPlayer)
 	player.ModIcon = new(ModIcon)
 	player.ModCard = new(ModCard)
+	player.ModUniqueTask = new(ModUniqueTask)
+	player.ModPlayer.PlayerLevel = 1 //初始等级是1级
 
 	//以上是模块初始化，下面是数据初始化
-	player.ModPlayer.Icon = 0
+	//player.ModPlayer.Icon = 0
 
 	return player
 }
