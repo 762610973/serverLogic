@@ -1,5 +1,7 @@
 package game
 
+import "sync"
+
 //每一个玩家就是一个结构,目前是包含两个模块
 //客户端直接和player模块交互，player收到消息。调用其他模块处理
 //receive函数，跟客户端打交道的函数
@@ -21,6 +23,8 @@ func NewTestPlayer() *Player {
 	player.ModIcon = new(ModIcon)
 	player.ModCard = new(ModCard)
 	player.ModUniqueTask = new(ModUniqueTask)
+	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)
+	player.ModUniqueTask.Locker = new(sync.RWMutex)
 	player.ModPlayer.PlayerLevel = 1 //初始等级是1级
 
 	//以上是模块初始化，下面是数据初始化
@@ -47,4 +51,18 @@ func (self *Player) ReceiveSetName(name string) {
 // ReceiveSetSign 设置签名
 func (self *Player) ReceiveSetSign(sign string) {
 	self.ModPlayer.SetSign(sign, self)
+}
+
+// ReduceWorldLevel 降低世界等级，是一个对外接口
+func (self *Player) ReduceWorldLevel() {
+	self.ModPlayer.ReduceWorldLevel(self)
+}
+
+// ReturnWorldLevel 返回世界等级
+func (self *Player) ReturnWorldLevel() {
+	self.ModPlayer.ReturnWorldLevel(self)
+}
+
+func (self *Player) SetBirth(birth int) {
+	self.ModPlayer.SetBirth(birth, self)
 }

@@ -1,5 +1,7 @@
 package game
 
+import "sync"
+
 // 唯一任务模块
 // 对于玩家生涯来说，只能做一次
 
@@ -12,6 +14,7 @@ type TaskInfo struct {
 type ModUniqueTask struct {
 	//保存任务的信息用map
 	MyTaskInfo map[int]*TaskInfo
+	Locker     *sync.RWMutex
 }
 
 func (self *ModUniqueTask) IsTaskFinish(taskId int) bool {

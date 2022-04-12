@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"serverLogic/server/src/csvs"
+	"time"
 )
 
 //每一个模块都对应数据库中的一张表
@@ -99,4 +100,65 @@ func (self *ModPlayer) AddExp(exp int, player *Player) {
 		}
 	}
 	fmt.Println("当前等级：", self.PlayerLevel, "---当前经验：", self.PlayerExp)
+}
+
+// ReduceWorldLevel 降低世界等级
+func (self *ModPlayer) ReduceWorldLevel(player *Player) {
+	// 如果等级小于5级，就不能进行降级
+	if self.WorldLevel < csvs.ReduceWorldLevelStart {
+		fmt.Println("操作失败，-----当时世界等级", self.WorldLevel)
+		return
+	}
+	// 如果自己的等级-当前世界等级大于等于1级，返回（最多降低一级）
+	if self.WorldLevel-self.WorldLevelNow >= csvs.ReduceWorldLevelMax {
+		fmt.Println("操作失败：-----当前世界等级", self.WorldLevel, "----真实世界等级，", self.WorldLevelNow)
+		return
+	}
+	if time.Now().Unix() < self.WorldLevelCool {
+		//没到达冷却时间
+		fmt.Println("操作失败：-----冷却中")
+		return
+	}
+	self.WorldLevel -= 1
+	self.WorldLevelCool = time.Now().Unix() + csvs.ReduceWorldCoolTime
+	fmt.Println("操作成功：------当前世界等级:", self.WorldLevel, "-----真实世界等级", self.WorldLevelNow)
+	return
+}
+func (self *ModPlayer) ReturnWorldLevel(player *Player) {
+	if self.WorldLevelNow == self.WorldLevel {
+		fmt.Println("操作失败：------当前世界等级", self.WorldLevel, "-----真实世界等级", self.WorldLevelNow)
+		return
+	}
+	if time.Now().Unix() < self.WorldLevelCool {
+		//没到达冷却时间
+		fmt.Println("操作失败：-----冷却中")
+		return
+	}
+	self.WorldLevel += 1
+	self.WorldLevelCool = time.Now().Unix() + csvs.ReduceWorldCoolTime
+	fmt.Println("操作成功：------当前世界等级:", self.WorldLevel, "-----真实世界等级", self.WorldLevelNow)
+	return
+}
+
+func (self *ModPlayer) SetBirth(birth int, player *Player) {
+	month := birth / 100
+	day := birth % 100
+	switch month {
+	case 1, 3, 5, 7, 8, 0, 12:
+		if day <= 0 || day > 31 {
+			fmt.Println(month, "月没有", day, "日！")
+			return
+		}
+	case 4, 6, 9, 11:
+		if day <= 0 || day > 30 {
+			fmt.Println(month, "月没有", day, "日！")
+			return
+		}
+	case 2:
+		if day <= 0 || day > 29 {
+			fmt.Println(month, "月没有", day, "日！")
+			return
+		}
+	}
+	//4
 }
