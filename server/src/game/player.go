@@ -8,10 +8,10 @@ import "sync"
 //增加经验的接口一定是内部接口
 
 type Player struct {
-	ModPlayer     *ModPlayer //基础模块
-	ModIcon       *ModIcon   //头像模块
-	ModCard       *ModCard   //名片模块
-	ModUniqueTask *ModUniqueTask
+	ModPlayer     *ModPlayer     //基础模块
+	ModIcon       *ModIcon       //头像模块
+	ModCard       *ModCard       //名片模块
+	ModUniqueTask *ModUniqueTask //唯一任务模块
 }
 
 // NewTestPlayer 生成玩家
