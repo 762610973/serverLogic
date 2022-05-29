@@ -7,8 +7,8 @@ import "sync"
 
 // TaskInfo 任务属性
 type TaskInfo struct {
-	TaskId int
-	State  int
+	TaskId int //
+	State  int //状态
 }
 
 type ModUniqueTask struct {
@@ -17,15 +17,17 @@ type ModUniqueTask struct {
 	Locker     *sync.RWMutex
 }
 
-func (self *ModUniqueTask) IsTaskFinish(taskId int) bool {
-	if taskId == 10001 || taskId == 10002 {
+// IsTaskFinish 判断任务是否完成
+func (t *ModUniqueTask) IsTaskFinish(taskId int) bool {
+	if taskId == 10001 || taskId == 10002 || taskId == 1003 || taskId == 1004 {
 		return true
 	}
-
-	task, ok := self.MyTaskInfo[taskId]
+	// 获取任务id
+	task, ok := t.MyTaskInfo[taskId]
 	if !ok {
 		return false
 	}
+	// 判断是否完成
 	return task.State == TaskStateFinish
 }
 

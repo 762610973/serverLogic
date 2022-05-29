@@ -24,3 +24,24 @@ func testExp() {
 		}
 	}
 }
+func playerSet(player *game.Player) {
+	startTime := time.Now().Nanosecond()
+	for i := 0; i < 100000; i++ {
+		player.ModUniqueTask.Locker.Lock()
+		player.ModUniqueTask.MyTaskInfo[10001] = new(game.TaskInfo)
+		player.ModUniqueTask.Locker.Unlock()
+	}
+	endTime := time.Now().Nanosecond() - startTime
+	fmt.Println(endTime / 1000000)
+}
+
+func playerGet(player *game.Player) {
+	for i := 0; i < 1000000; i++ {
+		player.ModUniqueTask.Locker.RLock()
+		_, ok := player.ModUniqueTask.MyTaskInfo[10001]
+		if ok {
+
+		}
+		player.ModUniqueTask.Locker.RUnlock()
+	}
+}

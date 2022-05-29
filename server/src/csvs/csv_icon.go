@@ -1,7 +1,20 @@
 package csvs
 
-import "fmt"
+import (
+	"serverLogic/server/src/utils"
+)
+
+type ConfigIcon struct {
+	IconId int `json:"IconId"`
+	Check  int `json:"Check"`
+}
+
+var (
+	ConfigIconMap map[int]*ConfigIcon
+)
 
 func init() {
-	fmt.Println("csv_icon 初始化")
+	ConfigIconMap = make(map[int]*ConfigIcon)
+	utils.GetCsvUtilMgr().LoadCsv("Icon", &ConfigIconMap)
+	return
 }

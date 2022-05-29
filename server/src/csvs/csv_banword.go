@@ -21,6 +21,7 @@ func init() {
 		&ConfigBanWord{Id: 3, Txt: "微信"},
 		&ConfigBanWord{Id: 4, Txt: "代练"},
 		&ConfigBanWord{Id: 5, Txt: "赚钱"},
+		&ConfigBanWord{Id: 6, Txt: "脚本"},
 	)
 	fmt.Println("csv_banWord 初始化")
 }
