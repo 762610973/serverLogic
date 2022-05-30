@@ -14,12 +14,12 @@ type ModIcon struct {
 }
 
 // IsHasIcon 判断Icon是否存在，把非法请求拦截在外
-
 func (m *ModIcon) IsHasIcon(iconId int) bool {
 	_, ok := m.IconInfo[iconId]
 	return ok
 }
 
+// AddItem 增加头像
 func (m *ModIcon) AddItem(itemId int) {
 	_, ok := m.IconInfo[itemId]
 	if ok {
@@ -33,4 +33,13 @@ func (m *ModIcon) AddItem(itemId int) {
 	}
 	m.IconInfo[itemId] = &Icon{itemId}
 	fmt.Println("获得头像：", itemId)
+}
+
+func (m *ModIcon) CheckGetIcon(roleId int) {
+	config := csvs.GetIconConfigByRoleId(roleId)
+	if config == nil {
+		return
+		//有些英雄获得可能不送头像
+	}
+	m.AddItem(config.IconId)
 }

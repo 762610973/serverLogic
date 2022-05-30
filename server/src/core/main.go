@@ -19,9 +19,10 @@ func main() {
 	//这里先获得一个基本的违禁词表，然后再调用run函数，run函数会调用读取配置表的函数，读取到完整的配置表
 
 	playerGM := game.NewTestPlayer()
-	playerGM.ModPlayer.SetIcon(3000001, playerGM)
-	playerGM.ModBag.AddItem(3000001, playerGM)
-	playerGM.ModPlayer.SetIcon(3000001, playerGM)
+	go playerGM.Run()
+	for {
+
+	}
 
 	//设置一个定时器
 	/*	ticker := time.NewTicker(time.Second * 10)

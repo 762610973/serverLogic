@@ -3,10 +3,16 @@ package csvs
 import "serverLogic/server/src/utils"
 
 const (
-	ItemTypeNormal = 1
-	ItemTypeRole   = 2
-	ItemTypeIcon   = 3
-	ItemTypeCard   = 4
+	ItemTypeNormal   = 1
+	ItemTypeRole     = 2
+	ItemTypeIcon     = 3
+	ItemTypeCard     = 4
+	ItemTypeWeapon   = 6
+	ItemTypeRelics   = 7
+	ItemTypeCookBook = 8
+	ItemTypeCook     = 9
+	ItemTypeFood     = 10
+	ItemTypeHomeItem = 11
 )
 
 type ConfigItem struct {
@@ -27,4 +33,12 @@ func init() {
 
 func GetItemConfig(itemId int) *ConfigItem {
 	return ConfigItemMap[itemId]
+}
+
+func GetItemName(itemId int) string {
+	config := GetItemConfig(itemId)
+	if config == nil {
+		return ""
+	}
+	return config.ItemName
 }

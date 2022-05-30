@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -17,6 +16,10 @@ type Player struct {
 	ModUniqueTask *ModUniqueTask //唯一任务模块
 	ModRole       *ModRole       //角色模块
 	ModBag        *ModBag        //背包模块
+	ModWeapon     *ModWeapon     //武器模块
+	ModRelics     *ModRelics     //圣遗物模块
+	ModCook       *ModCook       //烹饪模块
+	ModHome       *ModHome       //家园模块
 }
 
 // NewTestPlayer 生成玩家
@@ -25,14 +28,35 @@ func NewTestPlayer() *Player {
 	//模块初始化
 	player := new(Player)
 	player.ModPlayer = new(ModPlayer)
+
 	player.ModIcon = new(ModIcon)
 	player.ModIcon.IconInfo = make(map[int]*Icon)
+
 	player.ModCard = new(ModCard)
+	player.ModCard.CardInfo = make(map[int]*Card)
+
 	player.ModUniqueTask = new(ModUniqueTask)
 	player.ModUniqueTask.MyTaskInfo = make(map[int]*TaskInfo)
 	//player.ModUniqueTask.Locker = new(sync.RWMutex)
+
 	player.ModRole = new(ModRole)
+	player.ModRole.RoleInfo = make(map[int]*RoleInfo)
+
 	player.ModBag = new(ModBag)
+	player.ModBag.BagInfo = make(map[int]*ItemInfo)
+
+	player.ModWeapon = new(ModWeapon)
+	player.ModWeapon.WeaponInfo = make(map[int]*Weapon)
+
+	player.ModRelics = new(ModRelics)
+	player.ModRelics.RelicsInfo = make(map[int]*Relics)
+
+	player.ModCook = new(ModCook)
+	player.ModCook.CookInfo = make(map[int]*Cook)
+
+	player.ModHome = new(ModHome)
+	player.ModHome.HomeItemIdInfo = make(map[int]*HomeItemId)
+
 	player.ModPlayer.PlayerLevel = 1 //初始等级是1级
 	player.ModPlayer.WorldLevel = 6
 	player.ModPlayer.WorldLevelNow = 6
@@ -98,7 +122,10 @@ func (p *Player) Run() {
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println(time.Now().Unix())
+			if time.Now().Unix()%5 == 0 {
+				p.ModBag.AddItem(2000017, 7, p)
+			}
+			//fmt.Println(time.Now().Unix())
 		}
 	}
 }
