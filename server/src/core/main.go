@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"serverLogic/server/src/csvs"
 	"serverLogic/server/src/game"
+	"time"
 )
 
 func main() {
@@ -12,6 +14,7 @@ func main() {
 	//每个玩家都是一个线程 x 1
 	csvs.CheckLoadCsv()
 	fmt.Println("数据测试----start")
+	rand.Seed(time.Now().UnixNano())
 	//需要进行服务器的配置
 	// 启动一个违禁词goroutine
 

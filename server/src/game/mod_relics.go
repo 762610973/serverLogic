@@ -60,8 +60,8 @@ func (m *ModRelics) NewRelics(itemId int) *Relics {
 	reliceRel.MainEntry = m.MakeMainEntry(config.MainGroup)
 	for i := 0; i < config.OtherGroupNum; i++ {
 		if i == config.OtherGroupNum-1 {
-			randNum := rand.Intn(csvs.PERCENT_ALL)
-			if randNum < csvs.ALL_ENTRY_RATE {
+			randNum := rand.Intn(csvs.PercentAll)
+			if randNum < csvs.AllEntryRate {
 				reliceRel.OtherEntry = append(reliceRel.OtherEntry, m.MakeOtherEntry(reliceRel, config.OtherGroup))
 			}
 		} else {

@@ -127,7 +127,7 @@ func (m *ModWeapon) WeaponUpRefine(keyId int, targetKeyId int, player *Player) {
 		fmt.Println("错误的材料")
 		return
 	}
-	if weapon.RefineLevel >= csvs.WEAPON_MAX_REFINE {
+	if weapon.RefineLevel >= csvs.WeaponMaxRefine {
 		fmt.Println("超过了最大精炼等级")
 		return
 	}

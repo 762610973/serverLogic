@@ -62,3 +62,33 @@ func (m *ModRole) AddItem(roleId int, num int64, player *Player) {
 	player.ModIcon.CheckGetIcon(roleId)
 	player.ModCard.CheckGetCard(roleId, 10)
 }
+
+func (m *ModRole) HandleSendRoleInfo() {
+	fmt.Println("当前拥有角色信息如下")
+	for _, v := range m.RoleInfo {
+		v.SendRoleInfo()
+	}
+}
+
+func (r *RoleInfo) SendRoleInfo() {
+	fmt.Println(fmt.Sprintf("%s:,累计获得次数:%d", csvs.GetItemName(r.RoleId), r.GetTimes))
+}
+
+func (m *ModRole) GetRoleInfoForPoolCheck() (map[int]int, map[int]int) {
+	fiveInfo := make(map[int]int)
+	fourInfo := make(map[int]int)
+
+	for _, v := range m.RoleInfo {
+		// 获取配置
+		roleConfig := csvs.GetRoleConfig(v.RoleId)
+		if roleConfig == nil {
+			continue
+		}
+		if roleConfig.Star == 5 {
+			fiveInfo[roleConfig.RoleId] = v.GetTimes
+		} else if roleConfig.Star == 4 {
+			fourInfo[roleConfig.RoleId] = v.GetTimes
+		}
+	}
+	return fiveInfo, fourInfo
+}

@@ -102,7 +102,7 @@ func (m *ModBag) RemoveItemToBagGM(itemId int, num int64) {
 }
 
 // RemoveItemToBag 移除
-func (m *ModBag) RemoveItemToBag(itemId int, num int64) {
+func (m *ModBag) RemoveItemToBag(itemId int, num int64, player *Player) {
 	itemConfig := csvs.GetItemConfig(itemId)
 	switch itemConfig.SortType {
 	case csvs.ItemTypeRole:
@@ -180,6 +180,7 @@ func (m *ModBag) UseItem(itemId int, num int64, player *Player) {
 		fmt.Println(itemId, "此物品无法使用")
 		return
 	}
+
 }
 
 func (m *ModBag) UseCookBook(itemId int, num int64, player *Player) {
