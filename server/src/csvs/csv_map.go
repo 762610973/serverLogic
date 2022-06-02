@@ -3,18 +3,21 @@ package csvs
 import "serverLogic/server/src/utils"
 
 type ConfigMap struct {
-	MapId   int    `json:"MapId"`   //地图id
-	MapName string `json:"MapName"` //地图名称
+	MapId   int    `json:"MapId"`
+	MapName string `json:"MapName"`
+	MapType int    `json:"MapType"`
 }
 
-// ConfigMapEvent 地图事件配置
 type ConfigMapEvent struct {
-	EventId     int    `json:"EventId"`
-	EventType   int    `json:"EventType"`
-	Name        string `json:"Name"`
-	RefreshType int    `json:"RefreshType"`
-	EventDrop   int    `json:"EventDrop"`
-	MapId       int    `json:"MapId"`
+	EventId        int    `json:"EventId"`
+	EventType      int    `json:"EventType"`
+	Name           string `json:"Name"`
+	RefreshType    int    `json:"RefreshType"`
+	EventDrop      int    `json:"EventDrop"`
+	EventDropTimes int    `json:"EventDropTimes"`
+	MapId          int    `json:"MapId"`
+	CostItem       int    `json:"CostItem"`
+	CostNum        int64  `json:"CostNum"`
 }
 
 var (

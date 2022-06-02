@@ -26,7 +26,6 @@ type Player struct {
 }
 
 // NewTestPlayer 生成玩家
-// NewTestPlayer :new一个测试玩家
 func NewTestPlayer() *Player {
 	//模块初始化
 	player := new(Player)
@@ -126,14 +125,16 @@ func (p *Player) SetHideShowTeam(isHead int) {
 	p.ModPlayer.SetHideShowTeam(isHead, p)
 }
 
-// Run /*func (p *Player) Run() {
+func (p *Player) SetEventState(state int) {
+	//p.ModMap.SetEventState(state, p)
+}
+
 func (p *Player) Run() {
-	fmt.Println("从0开始写原神服务器------测试工具v0.1")
-	fmt.Println("作者:B站------golang大海葵")
+	fmt.Println("从0开始写原神服务器------测试工具")
 	fmt.Println("模拟用户创建成功OK------开始测试")
 	fmt.Println("↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓")
 	for {
-		fmt.Println(p.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3(优菈UP池)模拟抽卡1000W次4地图(未开放)")
+		fmt.Println(p.ModPlayer.Name, ",欢迎来到提瓦特大陆,请选择功能：1基础信息2背包3角色(八重神子UP池)4地图5圣遗物6角色7武器")
 		var modChoose int
 		fmt.Scan(&modChoose)
 		switch modChoose {
@@ -145,6 +146,12 @@ func (p *Player) Run() {
 			p.HandlePool()
 		case 4:
 			p.HandleMap()
+		case 5:
+			p.HandleRelics()
+		case 6:
+			p.HandleRole()
+		case 7:
+			p.HandleWeapon()
 		}
 	}
 }
@@ -299,7 +306,7 @@ func (p *Player) HandleBagSetBirth() {
 // HandleBag 背包
 func (p *Player) HandleBag() {
 	for {
-		fmt.Println("当前处于基础信息界面,请选择操作：0返回1增加物品2扣除物品3使用物品")
+		fmt.Println("当前处于基础信息界面,请选择操作：0返回1增加物品2扣除物品3使用物品4升级七天神像(风)")
 		var action int
 		fmt.Scan(&action)
 		switch action {
@@ -311,13 +318,55 @@ func (p *Player) HandleBag() {
 			p.HandleBagRemoveItem()
 		case 3:
 			p.HandleBagUseItem()
+		case 4:
+			p.HandleBagWindStatue()
 		}
 	}
 }
 
 // HandlePool 抽卡
 func (p *Player) HandlePool() {
-	p.ModPool.DoUpPool()
+	for {
+		fmt.Println("当前处于模拟抽卡界面,请选择操作：0返回1角色信息2十连抽(入包)3单抽(可选次数,入包)" +
+			"4五星爆点测试5十连多黄测试6视频原版函数(30秒)7单抽(仓检版,独宠一人)8单抽(仓检版,雨露均沾)")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		case 1:
+			p.ModRole.HandleSendRoleInfo(p)
+		case 2:
+			p.ModPool.HandleUpPoolTen(p)
+		case 3:
+			fmt.Println("请输入抽卡次数,最大值1亿(最大耗时约30秒):")
+			var times int
+			fmt.Scan(&times)
+			p.ModPool.HandleUpPoolSingle(times, p)
+		case 4:
+			fmt.Println("请输入抽卡次数,最大值1亿(最大耗时约30秒):")
+			var times int
+			fmt.Scan(&times)
+			p.ModPool.HandleUpPoolTimesTest(times)
+		case 5:
+			fmt.Println("请输入抽卡次数,最大值1亿(最大耗时约30秒):")
+			var times int
+			fmt.Scan(&times)
+			p.ModPool.HandleUpPoolFiveTest(times)
+		case 6:
+			p.ModPool.DoUpPool()
+		case 7:
+			fmt.Println("请输入抽卡次数,最大值1亿(最大耗时约30秒):")
+			var times int
+			fmt.Scan(&times)
+			p.ModPool.HandleUpPoolSingleCheck1(times, p)
+		case 8:
+			fmt.Println("请输入抽卡次数,最大值1亿(最大耗时约30秒):")
+			var times int
+			fmt.Scan(&times)
+			p.ModPool.HandleUpPoolSingleCheck2(times, p)
+		}
+	}
 }
 
 func (p *Player) HandleBagAddItem() {
@@ -350,9 +399,300 @@ func (p *Player) HandleBagUseItem() {
 	p.ModBag.UseItem(itemId, int64(itemNum), p)
 }
 
+func (p *Player) HandleBagWindStatue() {
+	fmt.Println("开始升级七天神像")
+	p.ModMap.UpStatue(1, p)
+	p.ModRole.CalHpPool()
+}
+
 // HandleMap 地图
 func (p *Player) HandleMap() {
 	fmt.Println("向着星辰与深渊,欢迎来到冒险家协会！")
-	fmt.Println("当前位置:", "蒙德城")
-	fmt.Println("地图模块还没写到......")
+	for {
+		fmt.Println("请选择互动地图1蒙德2璃月1001深入风龙废墟2001无妄引咎密宫")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		default:
+			p.HandleMapIn(action)
+		}
+	}
+}
+
+func (p *Player) HandleMapIn(mapId int) {
+	config := csvs.ConfigMapMap[mapId]
+	if config == nil {
+		fmt.Println("无法识别的地图")
+		return
+	}
+	p.ModMap.RefreshByPlayer(mapId)
+	for {
+		p.ModMap.GetEventList(config)
+		fmt.Println("请选择触发事件Id(0返回)")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		default:
+			eventConfig := csvs.ConfigMapEventMap[action]
+			if eventConfig == nil {
+				fmt.Println("无法识别的事件")
+				break
+			}
+			p.ModMap.SetEventState(mapId, eventConfig.EventId, csvs.EventEnd, p)
+		}
+	}
+}
+
+func (p *Player) HandleRelics() {
+	for {
+		fmt.Println("当前处于圣遗物界面，选择功能0返回1强化测试2满级圣遗物3极品头测试")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		case 1:
+			p.ModRelics.RelicsUp(p)
+		case 2:
+			p.ModRelics.RelicsTop(p)
+		case 3:
+			p.ModRelics.RelicsTestBest(p)
+		default:
+			fmt.Println("无法识别在操作")
+		}
+	}
+}
+
+func (p *Player) HandleRole() {
+	for {
+		fmt.Println("当前处于角色界面，选择功能0返回1查询2穿戴圣遗物3卸下圣遗物4穿戴武器5卸下武器")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		case 1:
+			p.ModRole.HandleSendRoleInfo(p)
+		case 2:
+			p.HandleWearRelics()
+		case 3:
+			p.HandleTakeOffRelics()
+		case 4:
+			p.HandleWearWeapon()
+		case 5:
+			p.HandleTakeOffWeapon()
+		default:
+			fmt.Println("无法识别在操作")
+		}
+	}
+}
+
+func (p *Player) HandleWearRelics() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := p.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(p)
+		fmt.Println("输入需要穿戴的圣遗物key:,0返回")
+		var relicsKey int
+		fmt.Scan(&relicsKey)
+		if relicsKey == 0 {
+			return
+		}
+		relics := p.ModRelics.RelicsInfo[relicsKey]
+		if relics == nil {
+			fmt.Println("圣遗物不存在")
+			continue
+		}
+		p.ModRole.WearRelics(RoleInfo, relics, p)
+	}
+}
+
+func (p *Player) HandleTakeOffRelics() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := p.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(p)
+		fmt.Println("输入需要卸下的圣遗物key:,0返回")
+		var relicsKey int
+		fmt.Scan(&relicsKey)
+		if relicsKey == 0 {
+			return
+		}
+		relics := p.ModRelics.RelicsInfo[relicsKey]
+		if relics == nil {
+			fmt.Println("圣遗物不存在")
+			continue
+		}
+		p.ModRole.TakeOffRelics(RoleInfo, relics, p)
+	}
+}
+
+func (p *Player) HandleWeapon() {
+	for {
+		fmt.Println("当前处于武器界面，选择功能0返回1强化测试2突破测试3精炼测试")
+		var action int
+		fmt.Scan(&action)
+		switch action {
+		case 0:
+			return
+		case 1:
+			p.HandleWeaponUp()
+		case 2:
+			p.HandleWeaponStarUp()
+		case 3:
+			p.HandleWeaponRefineUp()
+		default:
+			fmt.Println("无法识别在操作")
+		}
+	}
+}
+
+func (p *Player) HandleWeaponUp() {
+	for {
+		fmt.Println("输入操作的目标武器keyId:,0返回")
+		for _, v := range p.ModWeapon.WeaponInfo {
+			fmt.Println(fmt.Sprintf("武器keyId:%d,等级:%d,突破等级:%d,精炼:%d",
+				v.KeyId, v.Level, v.StarLevel, v.RefineLevel))
+		}
+		var weaponKeyId int
+		fmt.Scan(&weaponKeyId)
+		if weaponKeyId == 0 {
+			return
+		}
+		p.ModWeapon.WeaponUp(weaponKeyId, p)
+	}
+}
+
+func (p *Player) HandleWeaponStarUp() {
+	for {
+		fmt.Println("输入操作的目标武器keyId:,0返回")
+		for _, v := range p.ModWeapon.WeaponInfo {
+			fmt.Println(fmt.Sprintf("武器keyId:%d,等级:%d,突破等级:%d,精炼:%d",
+				v.KeyId, v.Level, v.StarLevel, v.RefineLevel))
+		}
+		var weaponKeyId int
+		fmt.Scan(&weaponKeyId)
+		if weaponKeyId == 0 {
+			return
+		}
+		p.ModWeapon.WeaponUpStar(weaponKeyId, p)
+	}
+}
+
+func (p *Player) HandleWeaponRefineUp() {
+	for {
+		fmt.Println("输入操作的目标武器keyId:,0返回")
+		for _, v := range p.ModWeapon.WeaponInfo {
+			fmt.Println(fmt.Sprintf("武器keyId:%d,等级:%d,突破等级:%d,精炼:%d",
+				v.KeyId, v.Level, v.StarLevel, v.RefineLevel))
+		}
+		var weaponKeyId int
+		fmt.Scan(&weaponKeyId)
+		if weaponKeyId == 0 {
+			return
+		}
+		for {
+			fmt.Println("输入作为材料的武器keyId:,0返回")
+			var weaponTargetKeyId int
+			fmt.Scan(&weaponTargetKeyId)
+			if weaponTargetKeyId == 0 {
+				return
+			}
+			p.ModWeapon.WeaponUpRefine(weaponKeyId, weaponTargetKeyId, p)
+		}
+	}
+}
+
+func (p *Player) HandleWearWeapon() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := p.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(p)
+		fmt.Println("输入需要穿戴的武器key:,0返回")
+		var weaponKey int
+		fmt.Scan(&weaponKey)
+		if weaponKey == 0 {
+			return
+		}
+		weaponInfo := p.ModWeapon.WeaponInfo[weaponKey]
+		if weaponInfo == nil {
+			fmt.Println("武器不存在")
+			continue
+		}
+		p.ModRole.WearWeapon(RoleInfo, weaponInfo, p)
+		RoleInfo.ShowInfo(p)
+	}
+}
+
+func (p *Player) HandleTakeOffWeapon() {
+	for {
+		fmt.Println("输入操作的目标英雄Id:,0返回")
+		var roleId int
+		fmt.Scan(&roleId)
+
+		if roleId == 0 {
+			return
+		}
+
+		RoleInfo := p.ModRole.RoleInfo[roleId]
+		if RoleInfo == nil {
+			fmt.Println("英雄不存在")
+			continue
+		}
+
+		RoleInfo.ShowInfo(p)
+		fmt.Println("输入需要卸下的武器key:,0返回")
+		var weaponKey int
+		fmt.Scan(&weaponKey)
+		if weaponKey == 0 {
+			return
+		}
+		weapon := p.ModWeapon.WeaponInfo[weaponKey]
+		if weapon == nil {
+			fmt.Println("武器不存在")
+			continue
+		}
+		p.ModRole.TakeOffWeapon(RoleInfo, weapon, p)
+		RoleInfo.ShowInfo(p)
+	}
 }

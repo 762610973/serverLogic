@@ -18,10 +18,11 @@ const (
 	WeaponMaxRefine             = 5 //武器的最大精炼等级
 )
 
+// 掉落
 const (
-	DROP_ITEM_TYPE_ITEM   = 1
-	DROP_ITEM_TYPE_GROUP  = 2
-	DROP_ITEM_TYPE_WEIGHT = 3
+	DropItemTypeItem   = 1
+	DropItemTypeGroup  = 2
+	DropItemTypeWeight = 3
 )
 
 // 蒲公英只有0/10两种，矿物有三种
@@ -30,22 +31,22 @@ const (
 	EventFinish = 9
 	EventEnd    = 10
 
-	EVENT_TYPE_NORMAL = 1
-	EVENT_TYPE_REWARD = 2
+	EventTypeNormal = 1
+	EventTypeReward = 2
 )
 
 const (
-	MapRefreshDay    = 1
-	MapRefreshWeek   = 2
-	MapRefreshSelf   = 3
-	MAP_REFRESH_CANT = 4
+	MapRefreshDay  = 1
+	MapRefreshWeek = 2
+	MapRefreshSelf = 3
+	MapRefreshCant = 4
 
 	MapRefreshDayTime  = 20
 	MapRefreshWeekTime = 40
 	MapRefreshSelfTime = 60
 
-	REFRESH_SYSTEM = 1
-	REFRESH_PLAYER = 2
+	RefreshSystem = 1
+	RefreshPlayer = 2
 )
 
 const (

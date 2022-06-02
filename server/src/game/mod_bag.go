@@ -193,3 +193,16 @@ func (m *ModBag) UseCookBook(itemId int, num int64, player *Player) {
 	m.RemoveItem(itemId, num, player)
 	m.AddItem(cookBookConfig.Reward, num, player)
 }
+
+// GetItemNum 获取物品数量
+func (m *ModBag) GetItemNum(itemId int, player *Player) int64 {
+	itemConfig := csvs.GetItemConfig(itemId)
+	if itemConfig == nil {
+		return 0
+	}
+	_, ok := m.BagInfo[itemId]
+	if !ok {
+		return 0
+	}
+	return m.BagInfo[itemId].ItemNum
+}

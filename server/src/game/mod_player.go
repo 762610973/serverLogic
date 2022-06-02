@@ -270,3 +270,11 @@ func (m *ModPlayer) SetIsGM(isGm int) {
 func (m *ModPlayer) IsCanEnter() bool {
 	return int64(m.Prohibit) < time.Now().Unix()
 }
+
+func (m *ModPlayer) GetWorldLevelNow() int {
+	return m.WorldLevelNow
+}
+
+func (m *ModPlayer) RelicsUp(player *Player) {
+	player.ModRelics.RelicsUp(player)
+}

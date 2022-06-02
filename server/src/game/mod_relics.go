@@ -1,18 +1,15 @@
 package game
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
-	"os"
 	"serverLogic/server/src/csvs"
 )
 
 type Relics struct {
 	RelicsId   int
 	KeyId      int
-	MainEntry  int
+	MainEntry  int // 主词条
 	Level      int
 	Exp        int
 	OtherEntry []int
@@ -22,24 +19,18 @@ type Relics struct {
 type ModRelics struct {
 	RelicsInfo map[int]*Relics
 	MaxKey     int
-
-	player *Player
-	path   string
 }
 
 func (m *ModRelics) AddItem(itemId int, num int64) {
-
 	config := csvs.GetRelicsConfig(itemId)
 	if config == nil {
 		fmt.Println("配置不存在")
 		return
 	}
-
 	if len(m.RelicsInfo)+int(num) > csvs.RelicsMaxCount {
 		fmt.Println("超过最大值")
 		return
 	}
-
 	for i := int64(0); i < num; i++ {
 		relics := m.NewRelics(itemId)
 		m.RelicsInfo[relics.KeyId] = relics
@@ -49,34 +40,39 @@ func (m *ModRelics) AddItem(itemId int, num int64) {
 }
 
 func (m *ModRelics) NewRelics(itemId int) *Relics {
-	reliceRel := new(Relics)
-	reliceRel.RelicsId = itemId
+	relicRel := new(Relics)
+	relicRel.RelicsId = itemId
 	m.MaxKey++
-	reliceRel.KeyId = m.MaxKey
+	relicRel.KeyId = m.MaxKey
+	// 拿配置
 	config := csvs.ConfigRelicsMap[itemId]
 	if config == nil {
 		return nil
 	}
-	reliceRel.MainEntry = m.MakeMainEntry(config.MainGroup)
+
+	relicRel.MainEntry = m.MakeMainEntry(config.MainGroup)
 	for i := 0; i < config.OtherGroupNum; i++ {
 		if i == config.OtherGroupNum-1 {
+			// 最后一次走概率
 			randNum := rand.Intn(csvs.PercentAll)
 			if randNum < csvs.AllEntryRate {
-				reliceRel.OtherEntry = append(reliceRel.OtherEntry, m.MakeOtherEntry(reliceRel, config.OtherGroup))
+				relicRel.OtherEntry = append(relicRel.OtherEntry, m.MakeOtherEntry(relicRel, config.OtherGroup))
 			}
 		} else {
-			reliceRel.OtherEntry = append(reliceRel.OtherEntry, m.MakeOtherEntry(reliceRel, config.OtherGroup))
+			relicRel.OtherEntry = append(relicRel.OtherEntry, m.MakeOtherEntry(relicRel, config.OtherGroup))
 		}
 	}
-	return reliceRel
+	return relicRel
 }
 
+// MakeMainEntry 生成主词条
 func (m *ModRelics) MakeMainEntry(mainGroup int) int {
 	configs, ok := csvs.ConfigRelicsEntryGroupMap[mainGroup]
 	if !ok {
 		return 0
 	}
 	allRate := 0
+	// 获取总权值
 	for _, v := range configs {
 		allRate += v.Weight
 	}
@@ -91,6 +87,7 @@ func (m *ModRelics) MakeMainEntry(mainGroup int) int {
 	return 0
 }
 
+// MakeOtherEntry 生成副词条
 func (m *ModRelics) MakeOtherEntry(relics *Relics, otherGroup int) int {
 	configs, ok := csvs.ConfigRelicsEntryGroupMap[otherGroup]
 	if !ok {
@@ -105,7 +102,7 @@ func (m *ModRelics) MakeOtherEntry(relics *Relics, otherGroup int) int {
 		for _, id := range relics.OtherEntry {
 			otherConfig, _ := csvs.ConfigRelicsEntryMap[id]
 			if otherConfig != nil {
-				allEntry[otherConfig.AttrType] = csvs.LOGIC_TRUE
+				allEntry[otherConfig.AttrType] = csvs.LoginTrue
 			}
 		}
 
@@ -130,15 +127,16 @@ func (m *ModRelics) MakeOtherEntry(relics *Relics, otherGroup int) int {
 			}
 		}
 	} else {
+		// 做排重处理
 		allEntry := make(map[int]int)
 		mainConfig, _ := csvs.ConfigRelicsEntryMap[relics.MainEntry]
 		if mainConfig != nil {
-			allEntry[mainConfig.AttrType] = csvs.LOGIC_TRUE
+			allEntry[mainConfig.AttrType] = csvs.LoginTrue
 		}
 		for _, id := range relics.OtherEntry {
 			otherConfig, _ := csvs.ConfigRelicsEntryMap[id]
 			if otherConfig != nil {
-				allEntry[otherConfig.AttrType] = csvs.LOGIC_TRUE
+				allEntry[otherConfig.AttrType] = csvs.LoginTrue
 			}
 		}
 
@@ -166,14 +164,14 @@ func (m *ModRelics) MakeOtherEntry(relics *Relics, otherGroup int) int {
 	return 0
 }
 
-func (self *Relics) ShowInfo() {
-	fmt.Println(fmt.Sprintf("key:%d,Id:%d", self.KeyId, self.RelicsId))
-	fmt.Println(fmt.Sprintf("当前等级:%d,当前经验:%d", self.Level, self.Exp))
-	mainEntryConfig := csvs.GetReliceLevelConfig(self.MainEntry, self.Level)
+func (r *Relics) ShowInfo() {
+	fmt.Println(fmt.Sprintf("key:%d,Id:%d", r.KeyId, r.RelicsId))
+	fmt.Println(fmt.Sprintf("当前等级:%d,当前经验:%d", r.Level, r.Exp))
+	mainEntryConfig := csvs.GetRelicsLevelConfig(r.MainEntry, r.Level)
 	if mainEntryConfig != nil {
 		fmt.Println(fmt.Sprintf("主词条属性:%s,值:%d", mainEntryConfig.AttrName, mainEntryConfig.AttrValue))
 	}
-	for _, v := range self.OtherEntry {
+	for _, v := range r.OtherEntry {
 		otherEntryConfig := csvs.ConfigRelicsEntryMap[v]
 		if otherEntryConfig != nil {
 			fmt.Println(fmt.Sprintf("副词条属性:%s,值:%d", otherEntryConfig.AttrName, otherEntryConfig.AttrValue))
@@ -189,13 +187,15 @@ func (m *ModRelics) RelicsUp(player *Player) {
 	}
 	relics.Exp += 100000
 	for {
-		nextLevelConfig := csvs.GetReliceLevelConfig(relics.MainEntry, relics.Level+1)
+		nextLevelConfig := csvs.GetRelicsLevelConfig(relics.MainEntry, relics.Level+1)
 		if nextLevelConfig == nil {
 			break
 		}
+		// 小于下一级的经验，break
 		if relics.Exp < nextLevelConfig.NeedExp {
 			break
 		}
+		// 经验加一
 		relics.Level += 1
 		relics.Exp -= nextLevelConfig.NeedExp
 		if relics.Level%4 == 0 {
@@ -272,41 +272,4 @@ func (m *ModRelics) RelicsTestBest(player *Player) {
 	for _, v := range relicsBestInfo {
 		v.ShowInfo()
 	}
-}
-
-func (m *ModRelics) SaveData() {
-	content, err := json.Marshal(m)
-	if err != nil {
-		return
-	}
-	err = ioutil.WriteFile(m.path, content, os.ModePerm)
-	if err != nil {
-		return
-	}
-}
-
-func (m *ModRelics) LoadData(player *Player) {
-
-	m.player = player
-	m.path = m.player.localPath + "/relics.json"
-
-	configFile, err := ioutil.ReadFile(m.path)
-	if err != nil {
-		fmt.Println("error")
-		return
-	}
-	err = json.Unmarshal(configFile, &m)
-	if err != nil {
-		m.InitData()
-		return
-	}
-
-	if m.RelicsInfo == nil {
-		m.RelicsInfo = make(map[int]*Relics)
-	}
-	return
-}
-
-func (m *ModRelics) InitData() {
-
 }
