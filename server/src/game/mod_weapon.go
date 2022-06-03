@@ -74,6 +74,7 @@ func (m *ModWeapon) WeaponUp(keyId int, player *Player) {
 		weapon.Exp -= nextLevelConfig.NeedExp
 	}
 	weapon.ShowInfo()
+
 }
 
 func (w *Weapon) ShowInfo() {

@@ -13,6 +13,7 @@ var manageBanWord *ManageBanWord
 type ManageBanWord struct {
 	BanWordBase  []string //从配置表中读取违禁词语，是一个服务器线程
 	BanWordExtra []string //更新
+	MsgChannel   chan int
 }
 
 // GetManageBanWord 应用单例模式，任何时候都用的是同一个，节省空间，方便管理
@@ -22,6 +23,7 @@ func GetManageBanWord() *ManageBanWord {
 		manageBanWord = new(ManageBanWord)
 		manageBanWord.BanWordBase = []string{"外挂", "工具", "脚本"}
 		manageBanWord.BanWordExtra = []string{"原神", "股票", "刷单"}
+		manageBanWord.MsgChannel = make(chan int)
 	}
 	return manageBanWord
 }
@@ -51,6 +53,7 @@ func (m *ManageBanWord) IsBanWord(txt string) bool {
 // 定时器
 
 func (m *ManageBanWord) Run() {
+
 	//这里获取违禁词汇
 	m.BanWordBase = csvs.GetBanWordBase()
 	//fmt.Println(m.BanWordBase)
@@ -70,4 +73,8 @@ func (m *ManageBanWord) Run() {
 			}
 		}
 	}
+}
+
+func (m *ManageBanWord) Close() {
+	close(m.MsgChannel)
 }
